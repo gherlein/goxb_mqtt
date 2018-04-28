@@ -54,6 +54,7 @@ var (
 	debugraw        bool     = true
 	debugvector     bool     = false
 	debugjoy        bool     = false
+	debugtrigger    bool     = false
 	debugbutton     bool     = false
 	broker          string   = "tcp://localhost:1883"
 	joysticks       string   = "xb/1/joysticks"
@@ -147,6 +148,20 @@ func send_button(xbe *XBevent) {
 	token.Wait()
 }
 func send_trigger(xbe *XBevent) {
+	var msg string = "*|*"
+	if xbe.Code == LT {
+		msg = fmt.Sprintf("LT|%d", xbe.X)
+	}
+	if xbe.Code == RT {
+		msg = fmt.Sprintf("RT|%d", xbe.X)
+	}
+	if support_xy {
+		if debugtrigger {
+			fmt.Printf("%s\n", msg)
+		}
+		token := client.Publish(joysticks, byte(qos), false, msg)
+		token.Wait()
+	}
 }
 
 func send_joystick(xbe *XBevent) {

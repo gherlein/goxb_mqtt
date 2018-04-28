@@ -1,5 +1,64 @@
 # goxb
 
-This is a total experiment, aimed at reading an XBOX 360 controller directly from go using only libusb.  The goal is to have this functionality that will work on MacOS, Windows and Linux independent from OS-specific device drivers.
+This project uses libusb and implements a native XBox360(tm) controller reader in go.  Events 
+are read from the controller and written to an MQTT message broker.
 
-## EXPERIMENTAL.  DOES NOT WORK YET.
+## Topics
+
+Messages are sent to topics on the broker:
+
+```
+"xb/1/joysticks"
+"xb/1/triggers"
+"xb/1/buttons"
+```
+
+## Messages
+
+### Buttons
+
+Button presses generate discrete events as defined in the [xbevents](https://github.com/gherlein/xbevents) module.  Examples:
+
+```
+PADD_DOWN
+PADD_UP
+GUIDE_DOWN
+GUIDE_UP
+Y_DOWN
+Y_UP
+```
+
+### Triggers
+
+Triggers pulls generate discrete events as defined in the [xbevents](https://github.com/gherlein/xbevents) module.  Examples:
+
+```
+LT|0
+LT|53
+LT|107
+LT|255
+LT|80
+LT|0
+RT|78
+RT|152
+RT|147
+RT|85
+RT|0
+```
+
+### Joysticks
+
+Joysticks generate discrete events as defined in the [xbevents](https://github.com/gherlein/xbevents) module.  Examples:
+
+```
+L|Y|3584|0
+L|Y|21248|7424
+L|Y|32767|19712
+L|Y|32767|28160
+L|Y|32767|32767
+L|Y|32767|13312
+L|Y|11776|0
+L|X|-1536|0
+```
+
+

@@ -120,8 +120,7 @@ LT|0
 
 ## License
 
-This project is released under the MIT License.  Please see details 
-[here](https://gherlein.mit-license.org).
+This project is released under the MIT License.  Please see details [here](https://gherlein.mit-license.org).
 
 
 

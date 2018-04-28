@@ -90,7 +90,33 @@ topics that this tool publishes to.  Example:
 ```
 mosquitto_sub -h localhost -t "xb/#"
 ```
+This will read the messages from ALL the topics.  Example:
 
+```
+gherlein@mars ~/go/src/github.com/gherlein/gonetmon $ mosquitto_sub -h localhost -t "xb/#"
+R|X|0|0
+L|Y|0|0
+L|Y|0|-9472
+L|Y|0|-32768
+L|Y|0|0
+GUIDE_DOWN
+GUIDE_UP
+GUIDE_DOWN
+GUIDE_UP
+Y_DOWN
+Y_UP
+Y_DOWN
+Y_UP
+A_DOWN
+A_UP
+LT|255
+LT|0
+LT|255
+LT|51
+LT|0
+LT|255
+LT|0
+```
 
 ## License
 

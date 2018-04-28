@@ -1,11 +1,12 @@
-/*
+// goxb_mqtt
 
-
- */
+// code to read from an XBox360(tm) controller and write events to an MQTT broker
+// See the README.md file for documentation
 
 package main
 
 import (
+	"flag"
 	"fmt"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	. "github.com/gherlein/xbevents"
@@ -15,6 +16,7 @@ import (
 	"math"
 )
 
+// offests into the 20 byte controller packet
 const (
 	XB_PAD    = 2
 	XB_DECK   = 3
@@ -39,14 +41,14 @@ var (
 	endpoint        int      = 1
 	config          int      = 1
 	usbdebug        int      = 3
-	size            int      = 1024
+	size            int      = 64
 	bufSize         int      = 0
 	num             int      = 0
 	lx              int16    = 0
 	ly              int16    = 0
 	rx              int16    = 0
 	ry              int16    = 0
-	center          float64  = 1024
+	deadzone        int      = 512
 	support_xy      bool     = true
 	support_vector  bool     = false
 	support_buttons bool     = true
@@ -66,7 +68,14 @@ var (
 	client          MQTT.Client
 )
 
+func init() {
+	flag.StringVar(&broker, "broker", "tcp://localhost:1883", "broker connection string")
+	flag.IntVar(&deadzone, "deadzone", 1024, "center deadzone value for joysticks")
+	flag.Parse()
+}
+
 func main() {
+
 	var xbe *XBevent
 	opts := MQTT.NewClientOptions()
 	opts.AddBroker(broker)
@@ -242,7 +251,7 @@ func parseEvent(b1 []byte, b2 []byte, odd bool) *XBevent {
 		}
 		if (r != 0) && (i == XB_LJOY1X || i == XB_LJOY2X) {
 			data = int16(int16(buf[XB_LJOY1X]) | int16(buf[XB_LJOY2X])<<8)
-			if math.Abs(float64(data)) <= center {
+			if math.Abs(float64(data)) <= float64(deadzone) {
 				data = 0
 			}
 			xbe.Code = LJOYX
@@ -253,7 +262,7 @@ func parseEvent(b1 []byte, b2 []byte, odd bool) *XBevent {
 		}
 		if (r != 0) && (i == XB_LJOY1Y || i == XB_LJOY2Y) {
 			data = int16(int16(buf[XB_LJOY1Y]) | int16(buf[XB_LJOY2Y])<<8)
-			if math.Abs(float64(data)) <= center {
+			if math.Abs(float64(data)) <= float64(deadzone) {
 				data = 0
 			}
 			xbe.Code = LJOYY
@@ -264,7 +273,7 @@ func parseEvent(b1 []byte, b2 []byte, odd bool) *XBevent {
 		}
 		if (r != 0) && (i == XB_RJOY1X || i == XB_RJOY2X) {
 			data = int16(int16(buf[XB_RJOY1X]) | int16(buf[XB_RJOY2X])<<8)
-			if math.Abs(float64(data)) <= center {
+			if math.Abs(float64(data)) <= float64(deadzone) {
 				data = 0
 			}
 			xbe.Code = RJOYX
@@ -275,7 +284,7 @@ func parseEvent(b1 []byte, b2 []byte, odd bool) *XBevent {
 		}
 		if (r != 0) && (i == XB_RJOY1Y || i == XB_RJOY2Y) {
 			data = int16(int16(buf[XB_RJOY1Y]) | int16(buf[XB_RJOY2Y])<<8)
-			if math.Abs(float64(data)) <= center {
+			if math.Abs(float64(data)) <= float64(deadzone) {
 				data = 0
 			}
 			xbe.Code = RJOYY

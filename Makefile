@@ -32,7 +32,7 @@ clean:
 	-rm -f *~
 
 run:
-	sudo ./goxb_mqtt
+	sudo ./goxb_mqtt --deadzone=512 --broker="tcp://localhost:1883"
 
 
 

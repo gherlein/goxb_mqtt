@@ -3,6 +3,27 @@
 This project uses libusb and implements a native XBox360(tm) controller reader in go.  Events 
 are read from the controller and written to an MQTT message broker.
 
+This tool requires that libusb is installed.
+
+## Usage
+
+### Linux
+
+```
+sudo ./goxb_mqtt --deadzone=512 --broker="tcp://localhost:1883"
+```
+Note that you can specify the deadzone and the broker location on the command line but the values shown are the defaults.
+
+### MacOS
+
+Untested
+
+
+### Windows
+
+Untested 
+
+
 ## Topics
 
 Messages are sent to topics on the broker:
@@ -60,5 +81,11 @@ L|Y|32767|13312
 L|Y|11776|0
 L|X|-1536|0
 ```
+
+## License
+
+This project is released under the MIT License.  Please see details 
+[here] (https://gherlein.mit-license.org).
+
 
 

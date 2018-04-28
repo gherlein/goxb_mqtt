@@ -82,6 +82,16 @@ L|Y|11776|0
 L|X|-1536|0
 ```
 
+## Testing
+
+From a linux or MacOS machine, use the mosquitto_sub tool to read messages from the broker on the 
+topics that this tool publishes to.  Example:
+
+```
+mosquitto_sub -h localhost -t "xb/#"
+```
+
+
 ## License
 
 This project is released under the MIT License.  Please see details 

@@ -1,4 +1,4 @@
-# goxb
+# goxb_mqtt
 
 This project uses libusb and implements a native XBox360(tm) controller reader in go.  Events 
 are read from the controller and written to an MQTT message broker.

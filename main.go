@@ -33,39 +33,40 @@ const (
 )
 
 var (
-	xbe             *XBevent
-	vid             gousb.ID = 0x045e
-	pid             gousb.ID = 0x028e
-	iface           int      = 0
-	alternate       int      = 0
-	endpoint        int      = 1
-	config          int      = 1
-	usbdebug        int      = 3
-	size            int      = 64
-	bufSize         int      = 0
-	num             int      = 0
-	lx              int16    = 0
-	ly              int16    = 0
-	rx              int16    = 0
-	ry              int16    = 0
-	deadzone        int      = 512
-	support_xy      bool     = true
-	support_vector  bool     = false
-	support_buttons bool     = true
-	debug           bool     = true
-	debugraw        bool     = true
-	debugvector     bool     = false
-	debugjoy        bool     = false
-	debugtrigger    bool     = false
-	debugbutton     bool     = false
-	broker          string   = "tcp://localhost:1883"
-	joysticks       string   = "xb/1/joysticks"
-	triggers        string   = "xb/1/triggers"
-	buttons         string   = "xb/1/buttons"
-	qos             int      = 0
-	xmult           int16    = 1
-	ymult           int16    = -1
-	client          MQTT.Client
+	xbe               *XBevent
+	vid               gousb.ID = 0x045e
+	pid               gousb.ID = 0x028e
+	iface             int      = 0
+	alternate         int      = 0
+	endpoint          int      = 1
+	config            int      = 1
+	usbdebug          int      = 3
+	size              int      = 64
+	bufSize           int      = 0
+	num               int      = 0
+	lx                int16    = 0
+	ly                int16    = 0
+	rx                int16    = 0
+	ry                int16    = 0
+	deadzone          int      = 512
+	support_xy        bool     = false
+	support_xy_topics bool     = true
+	support_vector    bool     = false
+	support_buttons   bool     = true
+	debug             bool     = true
+	debugraw          bool     = true
+	debugvector       bool     = false
+	debugjoy          bool     = false
+	debugtrigger      bool     = false
+	debugbutton       bool     = false
+	broker            string   = "tcp://localhost:1883"
+	joysticks         string   = "xb/1/joysticks"
+	triggers          string   = "xb/1/triggers"
+	buttons           string   = "xb/1/buttons"
+	qos               int      = 0
+	xmult             int16    = 1
+	ymult             int16    = -1
+	client            MQTT.Client
 )
 
 func init() {
@@ -174,26 +175,53 @@ func send_trigger(xbe *XBevent) {
 }
 
 func send_joystick(xbe *XBevent) {
-	var msg string = "*|*|*"
-	if xbe.Code == LJOYX {
-		msg = fmt.Sprintf("L|X|%d|%d", xbe.X, xbe.Y)
-	}
-	if xbe.Code == LJOYY {
-		msg = fmt.Sprintf("L|Y|%d|%d", xbe.X, xbe.Y)
-	}
-	if xbe.Code == RJOYX {
-		msg = fmt.Sprintf("R|X|%d|%d", xbe.X, xbe.Y)
-	}
-	if xbe.Code == RJOYY {
-		msg = fmt.Sprintf("R|Y|%d|%d", xbe.X, xbe.Y)
-	}
 	if support_xy {
+		var msg string = "*|*|*"
+		if xbe.Code == LJOYX {
+			msg = fmt.Sprintf("L|X|%d|%d", xbe.X, xbe.Y)
+		}
+		if xbe.Code == LJOYY {
+			msg = fmt.Sprintf("L|Y|%d|%d", xbe.X, xbe.Y)
+		}
+		if xbe.Code == RJOYX {
+			msg = fmt.Sprintf("R|X|%d|%d", xbe.X, xbe.Y)
+		}
+		if xbe.Code == RJOYY {
+			msg = fmt.Sprintf("R|Y|%d|%d", xbe.X, xbe.Y)
+		}
 		if debugjoy {
 			fmt.Printf("%s\n", msg)
 		}
 		token := client.Publish(joysticks, byte(qos), false, msg)
 		token.Wait()
 	}
+	if support_xy_topics {
+		var msg string = "*"
+		var topic string
+		if xbe.Code == LJOYX {
+			msg = fmt.Sprintf("%d", xbe.X)
+			topic = fmt.Sprintf("%s/L/X", joysticks)
+		}
+		if xbe.Code == LJOYY {
+			msg = fmt.Sprintf("%d", xbe.Y)
+			topic = fmt.Sprintf("%s/L/Y", joysticks)
+		}
+		if xbe.Code == RJOYX {
+			msg = fmt.Sprintf("%d", xbe.X)
+			topic = fmt.Sprintf("%s/R/X", joysticks)
+		}
+		if xbe.Code == RJOYY {
+			msg = fmt.Sprintf("%d", xbe.Y)
+			topic = fmt.Sprintf("%s/R/Y", joysticks)
+		}
+		if debugjoy {
+			fmt.Printf("%s\n", msg)
+		}
+		fmt.Printf("%s - %s\n", topic, msg)
+		token := client.Publish(topic, byte(qos), false, msg)
+		token.Wait()
+	}
+
 }
 
 func parseEvent(b1 []byte, b2 []byte, odd bool) *XBevent {
